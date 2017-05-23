@@ -20,3 +20,10 @@ $app->post('/auth', [
     'middleware' => 'auth',
     'uses' => 'ExampleController@auth'        
 ]);
+
+$app->post('/parseDocx', [
+    'uses' => 'ExampleController@docxParser'
+]);
+$app->post('/parseOdt', [
+    'uses' => 'ExampleController@odtParser'
+]);
