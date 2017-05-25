@@ -29,6 +29,14 @@ class ExampleController extends Controller
 
     public function odtParser(Request $request)
     {
+
+        $zip = new \ZipArchive;
+        $zip->open(base_path().'/runtime/filename.odt');
+        $zip->deleteName('content.xml');
+        $zip->extractTo(base_path().'/runtime/filename');
+
+        $zip->addFile(base_path().'/runtime/filename/content.xml');
+        $zip->close();
         $req = $request;
        /* if($request->isMethod('post')){
 
@@ -46,12 +54,51 @@ class ExampleController extends Controller
                 $a = [];
             }
         }*/
-        $path2 = base_path().'/runtime/filename/content.xml';
-        $b = file_get_contents($path2);
-        $xml = $xml = new \SimpleXMLElement(file_get_contents($path2));
-        $ns=$xml->getNamespaces(true);
-        $c = $xml->asXML();
+        /*$path2 = base_path().'/runtime/filename/content.xml';
+        /*$b = file_get_contents($path2);
+        $xml = new \SimpleXMLElement(file_get_contents($path2));
+        $ns = $xml->getNamespaces(true);
+        $xml->registerXPathNamespace('office', $ns['office']);
+        $texts = $xml->xpath('/office:document-content/office:body/office:text');
+        foreach ($texts as $text){
+            $f = $text->asXML();
+        }*/
+        //$d= $sel[0]->asXML();
         $a = [];
+
+        /*$doc = new \DOMDocument();
+        $res = $doc->loadXML(file_get_contents($path2));
+        $tags = $doc->getElementsByTagName('span');
+        $var = false;
+        foreach ($tags as $tag){
+
+            /*if($tag->nodeValue === '{{') {
+                $tag->nodeValue = '';
+                $var = true;
+                continue;
+            }
+            if($var){
+                $tag->nodeValue = 'Значение';
+            }
+            if($tag->nodeValue === '}}') {
+                $tag->nodeValue = '';
+                $var = true;
+                continue;
+            }*/
+           /* $span[] = $tag->nodeValue;
+
+        }
+        $tags = $doc->getElementsByTagName('p');
+
+        foreach ($tags as $tag){
+            $p[] = $tag->nodeValue;
+
+        }
+        $doc->saveXML();
+        $doc->save($path2);
+
+        $p = [];*/
+        $p = [];
 
     }
     
