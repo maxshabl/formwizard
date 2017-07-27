@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 
 class ExampleController extends Controller
 {
+    private $isOpen = '';
+    private $isClouse = '';
+    private $templVariable = '';
+
     /**
      * Create a new controller instance.
      */
@@ -27,9 +31,56 @@ class ExampleController extends Controller
         $b = [];
     }
 
+    private function isValid()
+    {
+        switch ($this->isOpen) {
+            case '{{':
+                return true;
+            case '{':
+                return true;
+            case '':
+                return true;
+            default:
+                abort(404, 'Template variable Error. You should use {{variable}}');
+        }
+
+        switch ($this->isClouse) {
+            case '}}':
+                return true;
+            case '}':
+                return true;
+            case '':
+                return true;
+            default:
+                abort(404, 'Template variable Error. You should use {{variable}}');
+        }
+    }
+
+    private function processParam($param)
+    {
+        $this->isValid();
+        if($param === '{' || $param === '{{') {
+            $this->isOpen .= $param;
+            return '';
+        }elseif ($param === '}' || $param === '}}') {
+            $this->isClouse .= $param;
+            return '';
+        }
+        if($this->isClouse === '}}') {
+            $this->isOpen = '';
+            $this->isClouse = '';
+            return 'Замена';
+        }
+        if($this->isOpen === '{{' && $this->isClouse === '') {
+            $this->templVariable .= $param;
+            return '';
+        }
+        return 'text';
+
+    }
+
     public function odtParser(Request $request)
     {
-        
 
         if($request->isMethod('post')){
             if($request->hasFile('odt')) {
@@ -43,11 +94,11 @@ class ExampleController extends Controller
                 $doc = new \DOMDocument();
                 $res = $doc->loadXML($content);
                 $spans = $doc->getElementsByTagName('span');
-                $inVarible = false;
                 foreach ($spans as $item) {
-                    $arr['span'][] = $item;
-                        $item->nodeValue = 'dfgdfgdfgdfg ';
-
+                    $var = $this->processParam($item->nodeValue);
+                    if($var !== 'text') {
+                        $item->nodeValue = $var;
+                    }
                 }
                 $doc->saveXML();
                 $doc->save($contentPath);
